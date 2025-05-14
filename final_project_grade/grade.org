@@ -1,0 +1,144 @@
+#+Author: Matt Teichman
+#+Title: Final Project Grade: Graham Livingston
+
+* Grade
+** Final grade in the class: A- 
+** Final project grade: 101%
+| component            | score |
+|----------------------+-------|
+| user feel            |    15 |
+|----------------------+-------|
+| code-style           |     9 |
+|----------------------+-------|
+| bug-free performance |     9 |
+|----------------------+-------|
+| minimal features     |    10 |
+|----------------------+-------|
+| locked doors         |    10 |
+|----------------------+-------|
+| custom feature       |    10 |
+|----------------------+-------|
+| documentation        |    10 |
+|----------------------+-------|
+| total                |   101 |
+#+TBLFM: @9$2=round((@I*1)+(@II*1)+(@III*3.5)+(@IIII*1)+(@IIIII*1.25)+(@IIIIII*1.25)+(@IIIIIII*1))
+** Summary
+Absolutely brilliant.  This was incredibly fun to play through, and I
+am astonished at how much you were able to change from the original
+architecture of the starter game.  The result is super polished, with
+lots of extra bells and whistles to make it extra playable.
+
+Thanks again for taking the class; it was great having you.  Please
+stay in touch; I'll be happy to hook you up with further resources for
+learning about functional programming.
+* Comments on Grade Components
+** User Feel
++ The UNIX theme is next-level!
++ Love that ASCII computer.
++ LOL @ hello world script.
++ The equals sign banner is fantastic too; really creates some amazing
+  atmosphere in conjunction with the prompt that live-updates the
+  path!
++ Totally awesome the way the weight is converted to disk space.  This
+  is really thoroughly thought through.
++ I really like all the information that gets displayed to the user,
+  like displaying the max weight and the weight of each item in the
+  =inventory= command.
++ Bonus points for such a creative re-imagining of the game
+  map/navigation/etc.
++ Bonus points for such an extensive UI, all the info being printed
+  for the user, etc.
++ LOL @ freeing your girlfriend by decrypting her.  Can't imagine what
+  it must feel like to be encrypted.
++ One suggestion I have is to suppress "Subdirectories:" when there
+  aren't any:
+  #+begin_example
+    /home/user/Desktop $ ls
+    Current directory: /home/user/Desktop
+    Contents:
+    terminal_config
+        Terminal configuration file
+
+    readme.txt
+        Welcome to your home directory! You need to find a way to access root.
+        Look around for programs and passwords that might help. Type 'help' for commands.
+
+
+    Subdirectories:
+
+
+  #+end_example
+** Code Style
++ Great monadic error handling in =GameState=.
++ I would use the full parsing framework for =cdP=, rather than mixing
+  conditional logic and parser combinators:
+  #+begin_src haskell
+    cdP :: Parser Command
+    cdP = do
+        _ <- string "cd" <* spaces
+        pure Cd <*> (cdUpP <|> intoP)
+      where
+        cdUpP = Up <$ string ".."
+
+    intoP :: Parser Direction
+    intoP = pure Into
+            <*> choice [ string "Documents" *> pure Documents
+                       , string "Downloads" *> pure Downloads
+                       , string "Desktop" *> pure Desktop
+                       , string "Projects" *> pure Projects
+                       , string "Games" *> pure Games
+                       , string "Work" *> pure Work
+                       , string "Personal" *> pure Personal
+                       , string "Programs" *> pure Programs
+                       , string "Media" *> pure Media
+                       , string "home" *> pure Home
+                       , string "user" *> pure UserHome
+                       , string "root" *> pure Root
+                       , string "sys" *> pure Sys
+                       , string "security" *> pure Security
+                       , string "keys" *> pure Keys
+                       , string "girlfriend" *> pure GirlfriendHome ]
+  #+end_src
+** Bug-Free Performance
++ I did notice an issue with one of the error messages:
+  #+begin_example
+    /home $ cd Desktop
+    No such directory: /home/user/Desktop
+  #+end_example
++ You could introduce some fanciness to fix this where =parseInput=
+  returns an either datatype with the string the user typed in in the
+  =Left= branch, but that would be a bunch of extra work.
++ For current purposes, I would probably just make this error message
+  less abmitious and have it print 'command not recognized' like it
+  does for a parse error:
+  #+begin_example
+    move (Into target) st =
+        let current = currentRoom st
+            validExits = [dest | (Into r, dest) <- exits current]
+        in if target `elem` validExits
+            then case canAccessRoom (permissions st) (hasSSHKey st) target of
+                Left err -> st { message = Just err }
+                Right _ -> st {
+                    player = Player.newLocation target (player st),
+                    message = Just $ "Changed directory to " ++ show target
+                }
+            else st { message = Just $ "Command not recognized." }
+  #+end_example
+** Required Minimal Features
++ Everything working great, from exits, weight limit, and command line
+  parsing.
++ It's impressive that all the minimal features are still working in
+  light of so many changes to the basic setup / data model.
+** Locked Doors Feature
++ Works perfectly!
+** Custom Feature
++ Wow!  Awesome error messaging on the new commands.
+  #+begin_example
+    /home/user $ take .bashrc and run .bashrc
+    You take .bashrc
+    .bashrc is not executable
+  #+end_example
+** Documentation
++ The readme is fantastic.
++ Love that overview blurb.
++ Super helpful for getting an overview of the game.
