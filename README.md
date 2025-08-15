@@ -1,4 +1,5 @@
 # UnixLove OS v1.0
+![loadScreen](https://github.com/user-attachments/assets/171f134d-fde5-4a79-908b-6acf9e4c13ab)
 
 ## Overview
 UnixLove OS is a text-based adventure game where you are a little program navigating through a Unix-like filesystem to find your girlfriend who has been carelessly encrypted. You'll need to explore directories, collect items, and gain the necessary permissions to access restricted areas.
